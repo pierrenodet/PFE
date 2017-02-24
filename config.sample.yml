@@ -1,0 +1,3 @@
+paths:
+    data_dir: /home/topaxa/Documents/PFE/
+    header_history: [buyer_id,visit_id,timestamp,event,status]
