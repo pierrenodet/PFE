@@ -39,3 +39,23 @@ for chelou in top20_chelou.index:
     print("achat = {0}".format(((history["buyer_id"]==chelou) & (history["event"]=="projet") & (history["status"]=="Gagné")).sum()),end=", ")
     print("achat = {0}".format(((history["buyer_id"]==chelou) & (history["event"]=="projet") & (history["status"]!="Gagné")).sum()))
 #On a l'impression qu'on est face a des acheteurs hésitants plutôt que des données fausses : on va les garder
+
+#Petite info sur le nombre de visite par buyer_id
+history[["buyer_id","visit_id"]].drop_duplicates().groupby(["buyer_id"]).count().describe()
+
+#On va regarder maintenant les timestamps
+max_ts = history[["buyer_id","timestamp"]].groupby(["buyer_id"]).max()
+min_ts = history[["buyer_id","timestamp"]].groupby(["buyer_id"]).min()
+
+from datetime import datetime
+
+kek=[0]*min_ts.size
+for i,m in enumerate(min_ts["timestamp"]):
+    kek[i] = datetime.strptime(m.split(".")[0],"%Y-%m-%d %H:%M:%S")
+min_ts["date"]=kek
+for i,m in enumerate(max_ts["timestamp"]):
+    kek[i] = datetime.strptime(m.split(".")[0],"%Y-%m-%d %H:%M:%S")
+max_ts["date"]=kek
+
+#Temps de passage par acheteur
+max_ts["date"]-min_ts["date"]
