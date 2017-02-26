@@ -58,4 +58,4 @@ for i,m in enumerate(max_ts["timestamp"]):
 max_ts["date"]=kek
 
 #Temps de passage par acheteur
-max_ts["date"]-min_ts["date"]
+(max_ts["date"]-min_ts["date"]).describe()
