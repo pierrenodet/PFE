@@ -14,6 +14,13 @@ import pandas as pd
 history=pd.read_csv(data_dir + "export_ensai_buyersHistory_170216.csv",sep="\t",header=None)
 history.columns=["buyer_id","visit_id","timestamp","event","status"]
 
+#Deja regardons s'il y a des redondances dans le dataframe
+history.shape
+history.drop_duplicates(inplace=True)
+
+history = history.loc[list(history.loc[:,["buyer_id","timestamp","event","status"]].drop_duplicates().index),:]
+history.shape
+
 #Regardons tout d'abord comment les acheteurs se comportent indépendamment des visites
 history.groupby("buyer_id")["event"].count().describe()
 #On peut voir que le nombre d'event median par buyer est de 2 mais que la moyenne est de 6.9 : distribution asymétrique.
@@ -61,6 +68,8 @@ max_ts["date"]=string_to_date(max_ts["timestamp"])
 #Temps de passage par acheteur
 (max_ts["date"]-min_ts["date"]).describe()
 
+## First model with Density
+
 #Maintenant essayons de calculer les densités d'évenements par rapport au moment de l'achat:
 #On crée un nouveau dataframe en changeant bien le type du timestamp
 density=history.copy()
@@ -102,3 +111,32 @@ plt.show()
 for event in density["event"].value_counts().index[0:5]:
     (density["time_diff"][density["event"]==event]).apply(timedelta.total_seconds).plot(kind="density",use_index=False).set_xlim(-30000000,0)
 plt.show()
+
+
+## Code R à modifier
+data <- read.csv("export_ensai_buyersHistory_170216.csv", sep="\t", header=FALSE)
+names(data) <- c("idVisiteur", "idVisite", "ts", "evt", "status")
+dataClean <- data[data$idVisiteur!="0001711d93602b75e401e",]
+dataClean$ts <- substr(dataClean$ts, start = 0, stop = 19)
+dataClean$ts <- as.POSIXlt(dataClean$ts)
+
+
+
+data2 <- dataClean[order(dataClean$idVisiteur), ]
+promin <- data.frame(idVisiteur=unique(data2$idVisiteur), evts=rep("",14653), stringsAsFactors=FALSE)
+
+for(i in 1:14653){
+  idVis <- promin$idVisiteur[i]
+  str <- ""
+  #creer la string d'evts
+  temp <- data2[data2$idVisiteur==idVis,]
+  temp <- temp[order(temp$ts),]
+  for(j in 1:length(temp[,1])){
+    str <- paste(str, temp[j,"evt"], sep=";")
+  }
+  promin$evts[i] <- str
+}
+promin$evts <- substr(promin$evts, start=2, stop=nchar(promin$evts))
+rm(i, idVis, temp, j, str)
+
+write.csv(x = promin, file = "listeTracesAcheteurs.csv", row.names=F)
