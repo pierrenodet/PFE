@@ -49,13 +49,34 @@ min_ts = history[["buyer_id","timestamp"]].groupby(["buyer_id"]).min()
 
 from datetime import datetime
 
-kek=[0]*min_ts.size
-for i,m in enumerate(min_ts["timestamp"]):
-    kek[i] = datetime.strptime(m.split(".")[0],"%Y-%m-%d %H:%M:%S")
-min_ts["date"]=kek
-for i,m in enumerate(max_ts["timestamp"]):
-    kek[i] = datetime.strptime(m.split(".")[0],"%Y-%m-%d %H:%M:%S")
-max_ts["date"]=kek
+def string_to_date(input_list):
+    kek=[0]*input_list.size
+    for i,m in enumerate(input_list):
+        kek[i] = datetime.strptime(m.split(".")[0],"%Y-%m-%d %H:%M:%S")
+    return kek
+
+min_ts["date"]=string_to_date(min_ts["timestamp"])
+max_ts["date"]=string_to_date(max_ts["timestamp"])
 
 #Temps de passage par acheteur
 (max_ts["date"]-min_ts["date"]).describe()
+
+#Maintenant essayons de calculer les densités d'évenements par rapport au moment de l'achat:
+#On crée un nouveau dataframe en changeant bien le type du timestamp
+density=history.copy()
+density["timestamp"]=string_to_date(density["timestamp"])
+#density = pd.merge(density,max_ts.reset_index()[["buyer_id","date"]],on="buyer_id")
+#density=density.rename(columns = {'date_x':'min','date_y':'max'})
+#Ici on récupère la valuer du timestamp pour chaque achat ; puis on fait un groupby par buyer_id et on prend le timestamp du dernier achat (max)
+density = pd.merge(density,density[["buyer_id","timestamp"]][(density["status"]=="Gagné") & (density["event"]=="projet")].groupby("buyer_id").last().reset_index(),on="buyer_id")
+density.rename(columns={'timestamp_x':'timestamp','timestamp_y':'dernier_achat'},inplace=True)
+#Pour calculer la densité on prend donc que les valeures avant ce dernier achat.
+density = density[density["timestamp"]<=density["dernier_achat"]]
+#On calcule donc la difference entre timestamp et dernier_achat pour cacluler la densité
+density["time_diff"]=density["timestamp"]-density["dernier_achat"]
+
+from datetime import timedelta
+for event in density["event"].unique():
+    (density["time_diff"][density["event"]==event]).apply(timedelta.total_seconds).hist()
+
+plt.show()
