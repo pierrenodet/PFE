@@ -74,18 +74,22 @@ density.rename(columns={'timestamp_x':'timestamp','timestamp_y':'dernier_achat'}
 density = density[density["timestamp"]<=density["dernier_achat"]]
 #On calcule donc la difference entre timestamp et dernier_achat pour cacluler la densité
 density["time_diff"]=density["timestamp"]-density["dernier_achat"]
-from datetime import timedelta
-for event in density["event"].unique():
-    (density["time_diff"][density["event"]==event]).apply(timedelta.total_seconds).hist(stacked=True,bins=20).set_xlim(-20000000,0)
 
 import matplotlib
 matplotlib.style.use('ggplot')
 import matplotlib.pyplot as plt
+
+#Premier résultat avec des histogrammes stacked
+from datetime import timedelta
+for event in density["event"].unique():
+    (density["time_diff"][density["event"]==event]).apply(timedelta.total_seconds).hist(stacked=True,bins=20).set_xlim(-20000000,0)
 plt.show()
 
+#Résultats avec des densités
 for event in density["event"].unique():
     (density["time_diff"][density["event"]==event]).apply(timedelta.total_seconds).plot(kind="density",use_index=False).set_xlim(-20000000,0)
 plt.show()
+
 #On essaie de réduire le nombre d'event
 density.loc[density.loc[:,"event"].apply(str.startswith,args=("crm",)),"event"]="crm"
 density.loc[density.loc[:,"event"].apply(str.startswith,args=("iadvize",)),"event"]="iadvize"
