@@ -1,0 +1,15 @@
+# Data
+data
+
+# Unmaintained code
+old
+
+# Config file
+config.yml
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+
+# C extensions
+*.so
