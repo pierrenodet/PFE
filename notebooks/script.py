@@ -1,25 +1,13 @@
-##Importing Config File
+import os, sys, inspect
+# realpath() will make your script run, even if you symlink it :)
+cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))
+if cmd_folder not in sys.path:
+     sys.path.insert(0, cmd_folder)
 
-import yaml
-
-with open("config.yml", 'r') as ymlfile:
-    cfg = yaml.load(ymlfile)
-
-data_dir = cfg['paths']['data_dir']
-
-##Importing Data
-
-import pandas as pd
-
-history=pd.read_csv(data_dir + "export_ensai_buyersHistory_170216.csv",sep="\t",header=None)
-history.columns=["buyer_id","visit_id","timestamp","event","status"]
-
-#Deja regardons s'il y a des redondances dans le dataframe
-history.shape
-history.drop_duplicates(inplace=True)
-
-history = history.loc[list(history.loc[:,["buyer_id","timestamp","event","status"]].drop_duplicates().index),:]
-history.shape
+# use this if you want to include modules from a subfolder
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"subfolder")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
 
 #Regardons tout d'abord comment les acheteurs se comportent indépendamment des visites
 history.groupby("buyer_id")["event"].count().describe()
@@ -33,7 +21,6 @@ history[history["buyer_id"]==mec_chelou]["event"].value_counts()
 ((history["buyer_id"]==mec_chelou) & (history["event"]=="projet") & (history["status"]=="Gagné")).sum()
 #Seulement 19 projet acheté : C'est peut être le compte d'une entreprise ou simplement d'un employé du magasin réalisant des projets pour ces clients.
 #Pour le moment il n'est pas représentatif de la population et peut grandement fausser des futurs résultats : on préfère l'enlever pour le moment.
-history = history[history["buyer_id"]!=mec_chelou].reset_index(drop=True)
 
 #Regardons de nouveau les acheteurs
 history.groupby("buyer_id")["event"].count().describe()
@@ -55,15 +42,10 @@ max_ts = history[["buyer_id","timestamp"]].groupby(["buyer_id"]).max()
 min_ts = history[["buyer_id","timestamp"]].groupby(["buyer_id"]).min()
 
 from datetime import datetime
+from model_density import stringlist_to_datelist
 
-def string_to_date(input_list):
-    kek=[0]*input_list.size
-    for i,m in enumerate(input_list):
-        kek[i] = datetime.strptime(m.split(".")[0],"%Y-%m-%d %H:%M:%S")
-    return kek
-
-min_ts["date"]=string_to_date(min_ts["timestamp"])
-max_ts["date"]=string_to_date(max_ts["timestamp"])
+min_ts["date"]=stringlist_to_datelist(min_ts["timestamp"])
+max_ts["date"]=stringlist_to_datelist(max_ts["timestamp"])
 
 #Temps de passage par acheteur
 (max_ts["date"]-min_ts["date"]).describe()
@@ -71,18 +53,10 @@ max_ts["date"]=string_to_date(max_ts["timestamp"])
 ## First model with Density
 
 #Maintenant essayons de calculer les densités d'évenements par rapport au moment de l'achat:
-#On crée un nouveau dataframe en changeant bien le type du timestamp
-density=history.copy()
-density["timestamp"]=string_to_date(density["timestamp"])
-#density = pd.merge(density,max_ts.reset_index()[["buyer_id","date"]],on="buyer_id")
-#density=density.rename(columns = {'date_x':'min','date_y':'max'})
-#Ici on récupère la valuer du timestamp pour chaque achat ; puis on fait un groupby par buyer_id et on prend le timestamp du dernier achat (max)
-density = pd.merge(density,density[["buyer_id","timestamp"]][(density["status"]=="Gagné") & (density["event"]=="projet")].groupby("buyer_id").last().reset_index(),on="buyer_id")
-density.rename(columns={'timestamp_x':'timestamp','timestamp_y':'dernier_achat'},inplace=True)
-#Pour calculer la densité on prend donc que les valeures avant ce dernier achat.
-density = density[density["timestamp"]<=density["dernier_achat"]]
-#On calcule donc la difference entre timestamp et dernier_achat pour cacluler la densité
-density["time_diff"]=density["timestamp"]-density["dernier_achat"]
+#On importe le dataframe density_data
+#Pour calculer la densité on prend donc que les valeures avant le dernier achat de chaque acheteur.
+#On calcule donc la difference entre timestamp et last_purchase_timestamp pour cacluler la densité : timestamp_difference
+from model_density import density_data
 
 import matplotlib
 matplotlib.style.use('ggplot')
