@@ -1,13 +1,10 @@
+""" A utliser si problèmes d'import de données
 import os, sys, inspect
 # realpath() will make your script run, even if you symlink it :)
 cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))
 if cmd_folder not in sys.path:
      sys.path.insert(0, cmd_folder)
-
-# use this if you want to include modules from a subfolder
-cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"subfolder")))
-if cmd_subfolder not in sys.path:
-    sys.path.insert(0, cmd_subfolder)
+"""
 
 #Regardons tout d'abord comment les acheteurs se comportent indépendamment des visites
 history.groupby("buyer_id")["event"].count().describe()
@@ -38,11 +35,8 @@ for chelou in top20_chelou.index:
 history[["buyer_id","visit_id"]].drop_duplicates().groupby(["buyer_id"]).count().describe()
 
 #On va regarder maintenant les timestamps
-max_ts = history[["buyer_id","timestamp"]].groupby(["buyer_id"]).max()
-min_ts = history[["buyer_id","timestamp"]].groupby(["buyer_id"]).min()
-
-from datetime import datetime
-from model_density import stringlist_to_datelist
+max_ts = buyer_history[["buyer_id","timestamp"]].groupby(["buyer_id"]).max()
+min_ts = buyer_history[["buyer_id","timestamp"]].groupby(["buyer_id"]).min()
 
 min_ts["date"]=stringlist_to_datelist(min_ts["timestamp"])
 max_ts["date"]=stringlist_to_datelist(max_ts["timestamp"])
@@ -88,32 +82,3 @@ test = test[~((test["event"]=="passage_en_magasin")& (test["time_diff"]==timedel
 for event in test["event"].unique():
     (test["time_diff"][test["event"]==event]).apply(timedelta.total_seconds).plot(kind="density",use_index=False,legend='reverse',label=event).set_xlim(-30000000,0)
 plt.show()
-
-
-## Code R à modifier
-data <- read.csv("export_ensai_buyersHistory_170216.csv", sep="\t", header=FALSE)
-names(data) <- c("idVisiteur", "idVisite", "ts", "evt", "status")
-dataClean <- data[data$idVisiteur!="0001711d93602b75e401e",]
-dataClean$ts <- substr(dataClean$ts, start = 0, stop = 19)
-dataClean$ts <- as.POSIXlt(dataClean$ts)
-
-
-
-data2 <- dataClean[order(dataClean$idVisiteur), ]
-promin <- data.frame(idVisiteur=unique(data2$idVisiteur), evts=rep("",14653), stringsAsFactors=FALSE)
-
-for(i in 1:14653){
-  idVis <- promin$idVisiteur[i]
-  str <- ""
-  #creer la string d'evts
-  temp <- data2[data2$idVisiteur==idVis,]
-  temp <- temp[order(temp$ts),]
-  for(j in 1:length(temp[,1])){
-    str <- paste(str, temp[j,"evt"], sep=";")
-  }
-  promin$evts[i] <- str
-}
-promin$evts <- substr(promin$evts, start=2, stop=nchar(promin$evts))
-rm(i, idVis, temp, j, str)
-
-write.csv(x = promin, file = "listeTracesAcheteurs.csv", row.names=F)
