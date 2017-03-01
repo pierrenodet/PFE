@@ -7,6 +7,9 @@ old
 # Config file
 config.yml
 
+# Notebooks
+.ipynb_checkpoints
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.pyc
