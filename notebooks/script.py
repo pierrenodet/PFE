@@ -1,10 +1,16 @@
-""" A utliser si problèmes d'import de données
 import os, sys, inspect
 # realpath() will make your script run, even if you symlink it :)
 cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))
 if cmd_folder not in sys.path:
-     sys.path.insert(0, cmd_folder)
-"""
+     sys.path.insert(0, '/home/topaxa/Documents/PFE/')
+
+# use this if you want to include modules from a subfolder
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"subfolder")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
+
+from src.find_dir import cmd_folder
+
 
 #Regardons tout d'abord comment les acheteurs se comportent indépendamment des visites
 history.groupby("buyer_id")["event"].count().describe()
@@ -35,8 +41,11 @@ for chelou in top20_chelou.index:
 history[["buyer_id","visit_id"]].drop_duplicates().groupby(["buyer_id"]).count().describe()
 
 #On va regarder maintenant les timestamps
-max_ts = buyer_history[["buyer_id","timestamp"]].groupby(["buyer_id"]).max()
-min_ts = buyer_history[["buyer_id","timestamp"]].groupby(["buyer_id"]).min()
+max_ts = history[["buyer_id","timestamp"]].groupby(["buyer_id"]).max()
+min_ts = history[["buyer_id","timestamp"]].groupby(["buyer_id"]).min()
+
+from datetime import datetime
+from clean_data import stringlist_to_datelist
 
 min_ts["date"]=stringlist_to_datelist(min_ts["timestamp"])
 max_ts["date"]=stringlist_to_datelist(max_ts["timestamp"])
@@ -48,9 +57,9 @@ max_ts["date"]=stringlist_to_datelist(max_ts["timestamp"])
 
 #Maintenant essayons de calculer les densités d'évenements par rapport au moment de l'achat:
 #On importe le dataframe density_data
+from model_density import density_data
 #Pour calculer la densité on prend donc que les valeures avant le dernier achat de chaque acheteur.
 #On calcule donc la difference entre timestamp et last_purchase_timestamp pour cacluler la densité : timestamp_difference
-from model_density import density_data
 
 import matplotlib
 matplotlib.style.use('ggplot')
@@ -67,17 +76,10 @@ for event in density["event"].unique():
     (density["time_diff"][density["event"]==event]).apply(timedelta.total_seconds).plot(kind="density",use_index=False).set_xlim(-20000000,0)
 plt.show()
 
-#On essaie de réduire le nombre d'event
-density.loc[density.loc[:,"event"].apply(str.startswith,args=("crm",)),"event"]="crm"
-density.loc[density.loc[:,"event"].apply(str.startswith,args=("iadvize",)),"event"]="iadvize"
-density.loc[density.loc[:,"event"].apply(str.startswith,args=("demande",)),"event"]="demande"
-density["event"].value_counts()
 for event in density["event"].unique():
     (density["time_diff"][density["event"]==event]).apply(timedelta.total_seconds).plot(kind="density",use_index=False).set_xlim(-30000000,0)
 plt.show()
 #On essaie en enlevant les projets gagnés et les passages en magasin le jour de l'achat
-test = density[~((density["event"]=="projet")&(density["status"]=="Gagné"))]
-test = test[~((test["event"]=="passage_en_magasin")& (test["time_diff"]==timedelta(minutes=0)))]
 #Pour faire un top 5 test["event"].value_counts().index[0:5]:
 for event in test["event"].unique():
     (test["time_diff"][test["event"]==event]).apply(timedelta.total_seconds).plot(kind="density",use_index=False,legend='reverse',label=event).set_xlim(-30000000,0)
