@@ -43,5 +43,5 @@ python3 setup.py install
 
 Comment télécharger Jupyter Notebook :
 
-pip3 install jupyter
+pip3 install jupyter  
 pip3 install ipython
