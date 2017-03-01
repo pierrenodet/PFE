@@ -19,7 +19,7 @@ https://drivendata.github.io/cookiecutter-data-science/
 
 Je vous laisse donc consulter les détails dessus.
 
-## Configuration File
+## Configuration File (Pas utile pour le moment)
 
 Dans ce repository il y a un fichier de configuration écrit en YAML (version "human readable" de JSON).
 
@@ -30,7 +30,7 @@ En revanche vous devez posséder sur votre machine un autre config.yml qui sera 
 
 ## Dépendances
 
-Ce script utilise Python 3.5.
+Ce github utilise Python 3.5.
 
 La liste des packages Python nécessaire pour ce github est dans requirements.txt
 
@@ -40,3 +40,8 @@ wget http://pyyaml.org/download/pyyaml/PyYAML-3.12.tar.gz
 tar -xvfz PyYAML-3.12.tar.gz  
 cd PyYAML-3.12/  
 python3 setup.py install  
+
+Comment télécharger Jupyter Notebook :
+
+pip3 install jupyter
+pip3 install ipython
