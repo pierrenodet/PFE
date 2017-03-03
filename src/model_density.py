@@ -10,10 +10,10 @@ buyer_history=pd.read_csv(cmd_folder+"data/processed/buyer_history.csv")
 
 density_difference = buyer_history.copy()
 
-density_difference.drop(["visit_id","event","status"],axis=1,inplace=True)
+density_difference.drop("visit_id",axis=1,inplace=True)
 density_difference["timestamp"]=stringlist_to_datelist(density_difference["timestamp"])
 
-last_purchase_timestamp = density_difference[["buyer_id","timestamp"]][density_difference["group"]=="project_win"].groupby("buyer_id").max().reset_index()
+last_purchase_timestamp = density_difference[["buyer_id","timestamp"]][density_difference["event"]=="project_win"].groupby("buyer_id").max().reset_index()
 density_difference = pd.merge(density_difference,last_purchase_timestamp,on="buyer_id")
 density_difference.rename(columns={'timestamp_x':'timestamp','timestamp_y':'last_purchase_timestamp'},inplace=True)
 
