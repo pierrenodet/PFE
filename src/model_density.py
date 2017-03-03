@@ -1,4 +1,5 @@
 import pandas as pd
+from datetime import timedelta
 from find_dir import cmd_folder
 from clean_data import stringlist_to_datelist
 
@@ -21,7 +22,7 @@ density_difference = density_difference[density_difference["timestamp"]<=density
 
 density_percentage = density_difference.copy()
 
-density_difference.loc[:,"timestamp_difference"]=density_difference["timestamp"]-density_difference["last_purchase_timestamp"]
+density_difference.loc[:,"timestamp_difference"]=(density_difference["timestamp"]-density_difference["last_purchase_timestamp"]).apply(timedelta.total_seconds)
 
 density_difference.to_csv(cmd_folder+"data/interim/density_difference.csv",index=False)
 
