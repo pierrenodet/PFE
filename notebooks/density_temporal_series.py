@@ -33,10 +33,11 @@ from src.model_density import density_data_cleaned
 from matplotlib import cm
 from numpy import linspace
 
-colors = [ cm.jet(x) for x in linspace(0.0,1.0, density_data_cleaned["event"].unique().size) ]
 
-for i,event in enumerate(density_data_cleaned["event"].unique()):
-    (density_data_cleaned["timestamp_difference"][density_data_cleaned["event"]==event]).apply(timedelta.total_seconds).plot(kind="density",use_index=False,legend='reverse',label=event,c=colors[i]).set_xlim(-30000000,0)
+colors = [ cm.jet(x) for x in linspace(0.0,1.0, density_data_cleaned["group"].unique().size) ]
+
+for i,event in enumerate(density_data_cleaned["group"].unique()):
+    (density_data_cleaned["timestamp_difference"][density_data_cleaned["group"]==event]).apply(timedelta.total_seconds).plot(kind="density",use_index=False,legend='reverse',label=event,c=colors[i]).set_xlim(-30000000,0)
 
 plt.legend(loc=2,prop={'size':6})
 plt.show()
@@ -94,9 +95,36 @@ colors = [ cm.jet(x) for x in linspace(0.0,1.0, density_perecentage["event"].uni
 for i,event in enumerate(density_perecentage["event"].unique()):
     (density_perecentage["timestamp_difference"][density_perecentage["event"]==event]).plot(kind="density",use_index=False,legend='reverse',label=event,figsize=(20,20),c=colors[i]).set_xlim(0,1)
 
-plt.legend(loc=2,prop={'size':30})
+plt.legend(loc=2,prop={'size':25})
 plt.show()
 
 #Stacked
 (density_perecentage["timestamp_difference"]).plot(kind="density",use_index=False,legend='reverse',label=event,figsize=(20,20)).set_xlim(0,1)
 plt.show()
+
+from scipy.stats import gaussian_kde
+colors = [ cm.jet(x) for x in linspace(0.0,1.0, density_perecentage["event"].unique().size) ]
+xs=linspace(0,1,200)
+
+#Stacked avec repartition
+kernel=[0]*density_perecentage["event"].unique().size
+for i,event in enumerate(density_perecentage["event"].unique()):
+    kernel[i] = gaussian_kde(density_perecentage["timestamp_difference"][density_perecentage["event"]==event].dropna())(xs)
+plt.stackplot(xs,kernel,colors=colors)
+plt.legend(density_perecentage["event"].unique(),prop={'size':8})
+plt.show()
+
+#Calcul du rapport entre densité de l'évenement et densité de tous les evenements
+kernel=[0]*density_perecentage["event"].unique().size
+for i,event in enumerate(density_perecentage["event"].unique()):
+    kernel[i] = gaussian_kde(density_perecentage["timestamp_difference"][density_perecentage["event"]==event].dropna())(xs)/gaussian_kde(density_perecentage["timestamp_difference"].dropna())(xs)
+plt.stackplot(xs,kernel,colors=colors)
+plt.legend(density_perecentage["event"].unique(),prop={'size':6})
+plt.show()
+
+kernels=[[0]*2]*density_perecentage["event"].unique().size
+for i,event in enumerate(density_perecentage["event"].unique()):
+    kernels[i][0] = gaussian_kde(density_perecentage["timestamp_difference"][density_perecentage["event"]==event].dropna())
+    kernels[i][1] = gaussian_kde(density_perecentage["timestamp_difference"].dropna())
+
+kernels
