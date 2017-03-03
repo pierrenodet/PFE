@@ -21,3 +21,15 @@ def stringlist_to_datelist(stringlist):
 buyer_history["timestamp"]=stringlist_to_datelist(buyer_history["timestamp"])
 
 buyer_history.to_csv(cmd_folder+"data/interim/buyer_history_noduplicate.csv",index=False)
+
+##Cleaning crm
+#Need xlrd package installed iirc (no need to import it tho !)
+crm = pd.read_excel(cmd_folder + "data/raw/PFEensai2017_description_des_donnees.xlsx")
+crm = crm.ix[:,['event_name','status','group_name']]
+crm.columns = ['event','status','group_name']
+
+result = pd.merge(buyer_history, crm, on=['event', 'status'])
+result = result.drop(['event','status'],axis=1)
+result.columns = ["buyer_id","visit_id","timestamp","event"]
+
+result.to_csv(cmd_folder+"data/interim/buyer_history_cleaned_crm.csv",index=False)
