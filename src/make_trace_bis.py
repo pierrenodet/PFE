@@ -8,6 +8,8 @@ buyer_history = pd.read_csv(cmd_folder+"data/processed/buyer_history.csv")
 
 sorted_history = buyer_history[["buyer_id","timestamp","event"]].sort_values(["buyer_id","timestamp","event"],ascending=True)
 
+sorted_history["regroup"]=0
+
 i=1
 while i < len(sorted_history.index.values.tolist()):
     b = sorted_history.index.values.tolist()[i]
