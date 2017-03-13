@@ -24,6 +24,8 @@ density_percentage = density_difference.copy()
 
 density_difference.loc[:,"timestamp_difference"]=(density_difference["timestamp"]-density_difference["last_purchase_timestamp"]).apply(timedelta.total_seconds)
 
+density_difference.drop(density_difference[density_difference["event"]=="quote_lose"].index.values,inplace=True)
+
 density_difference.to_csv(cmd_folder+"data/interim/density_difference.csv",index=False)
 
 #density_data_cleaned = density_data[~((density_data["event"]=="projet")&(density_data["status"]=="Gagné"))]
@@ -34,5 +36,7 @@ density_percentage = pd.merge(density_percentage,first_event_timestamp,on="buyer
 density_percentage.rename(columns={'timestamp_x':'timestamp','timestamp_y':'first_event_timestamp'},inplace=True)
 
 density_percentage["timestamp_percentage"]=(density_percentage["timestamp"]-density_percentage["first_event_timestamp"])/(density_percentage["last_purchase_timestamp"]-density_percentage["first_event_timestamp"])
+
+density_percentage.drop(density_percentage[density_percentage["event"]=="quote_lose"].index.values,inplace=True)
 
 density_percentage.to_csv(cmd_folder+"data/processed/density_percentage.csv",index=False)
