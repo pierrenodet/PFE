@@ -1,5 +1,5 @@
-host:
-port:
-protocol:
-user:
-pwd:
+'host': ftp.advalo.com
+'port': 2222
+'protocol': sftp
+'user': ensai_2017
+'pwd': HMax8TQuAL
