@@ -4,7 +4,7 @@ import paramiko
 import yaml
 import pandas as pd
 
-with open(cmd_folder+"config.sample.yml", 'r') as ymlfile:
+with open(cmd_folder+"config.yml", 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
 #Here will be put the script needed to download data from a future database or script to get data from other sources
