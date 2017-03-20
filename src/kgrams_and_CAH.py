@@ -61,4 +61,4 @@ sch.dendrogram(
     show_contracted=True,
 )
 plt.axhline(y=17, c='k')
-plt.show()
+plt.savefig(cmd_folder+"output/picture/dendrogram.png", bbox_inches='tight')

@@ -21,7 +21,8 @@ buyer_history["buyer_id"].value_counts().describe()
 buyer_history.drop(pd.merge(buyer_history, pd.DataFrame(buyer_history.groupby("buyer_id")["event"].count().sort_values(ascending=False)[0:1].index), on=["buyer_id"],right_index=True).index,inplace=True)
 plt.figure(figsize=(15, 1))
 plt.boxplot(buyer_history["buyer_id"].value_counts(), vert = 0, sym = 'b.')
-plt.show()
+plt.savefig(cmd_folder+"output/picture/boxplotBuyers.png", bbox_inches='tight')
+
 
 buyer_history["buyer_id"].value_counts().value_counts()[1]
 buyer_history["buyer_id"].value_counts().value_counts()[2]
@@ -40,7 +41,7 @@ non_buyer_history["buyer_id"].value_counts().describe()
 non_buyer_history.drop(pd.merge(non_buyer_history, pd.DataFrame(non_buyer_history.groupby("buyer_id")["event"].count().sort_values(ascending=False)[0:1].index), on=["buyer_id"],right_index=True).index,inplace=True)
 plt.figure(figsize=(15, 1))
 plt.boxplot(non_buyer_history["buyer_id"].value_counts(), vert = 0, sym = 'b.')
-plt.show()
+plt.savefig(cmd_folder+"output/picture/boxplotNonBuyers.png", bbox_inches='tight')
 
 non_buyer_history.drop(pd.merge(non_buyer_history, pd.DataFrame(non_buyer_history.groupby("buyer_id")["event"].count().sort_values(ascending=False)[0:7].index), on=["buyer_id"],right_index=True).index,inplace=True)
 

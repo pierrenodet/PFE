@@ -25,11 +25,3 @@ len_trace = buyer_history.groupby("buyer_id").size()
 buyer_history = pd.merge(buyer_history,pd.DataFrame(len_trace[len_trace>3].index),on="buyer_id",how="inner")
 
 buyer_history.to_csv(cmd_folder+"data/processed/buyer_history.csv",index=False)
-
-
-
-
-
-
-
-
