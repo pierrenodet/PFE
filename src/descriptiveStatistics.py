@@ -1,6 +1,7 @@
 #Descriptive statistics of the initial data
 from find_dir import cmd_folder
 import matplotlib.pyplot as plt
+plt.style.use('ggplot')
 import pandas as pd
 
 buyer_history = pd.read_csv(cmd_folder+"data/interim/buyer_history.csv")
@@ -23,11 +24,17 @@ plt.figure(figsize=(15, 1))
 plt.boxplot(buyer_history["buyer_id"].value_counts(), vert = 0, sym = 'b.')
 plt.savefig(cmd_folder+"output/picture/boxplotBuyers.png", bbox_inches='tight')
 
+len_trace = buyer_history.groupby("buyer_id").size()
+short_buyer_history = pd.merge(buyer_history,pd.DataFrame(len_trace[len_trace<4].index),on="buyer_id",how="inner")
+short_buyer_history.groupby("buyer_id").size().value_counts()
+short_buyer_history.groupby("buyer_id").size().value_counts()[2]/sum(short_buyer_history.groupby("buyer_id").size().value_counts()) #80% des parcours courts n'ont que 3 evts
 
-buyer_history["buyer_id"].value_counts().value_counts()[1]
-buyer_history["buyer_id"].value_counts().value_counts()[2]
-buyer_history["buyer_id"].value_counts().value_counts()[3]
-8731/(11+8731+2196) #80% des parcours courts n'ont que 3 evts
+event_count = short_buyer_history["event"].value_counts()
+event_count["events with less than 500 occurences"]=sum(event_count[event_count < 500])
+event_count = event_count[event_count >= 500]
+plt.figure(figsize=(5, 5))
+plt.pie(event_count, labels=event_count.index, colors=("#2c4caa", "#536283","#98a5c1","#94e1e3","#def1f9"), autopct='%1.1f%%')
+plt.savefig(cmd_folder+"output/picture/piechart.svg", bbox_inches='tight')
 
 buyer_history = pd.read_csv(cmd_folder+"data/processed/buyer_history.csv")
 len(set(buyer_history["buyer_id"]))
