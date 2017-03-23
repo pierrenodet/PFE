@@ -45,15 +45,16 @@ plt.show()
 
 ## Second model : density_perecentage
 
-from src.clean_data import stringlist_to_datelist
+from clean_data import stringlist_to_datelist
 import pandas as pd
 
-from src.model_density import density_percentage
+from model_density import density_percentage
 
 #On plot
 from matplotlib import cm
 from numpy import linspace
 from datetime import timedelta
+import matplotlib.pyplot as plt
 
 #Par evenement
 colors = [ cm.jet(x) for x in linspace(0.0,1.0, density_percentage["event"].unique().size) ]
@@ -163,30 +164,38 @@ plt.show()
 
 xs=linspace(0,1,1000)
 
-kernel=[0]*density_percentage["event"].unique().size
+kernels=[0]*density_percentage["event"].unique().size
 for i,event in enumerate(density_percentage["event"].unique()):
-    kernel[i] = gaussian_kde(density_percentage["timestamp_percentage"][density_percentage["event"]==event].dropna())(xs)
+    kernels[i] = gaussian_kde(density_percentage["timestamp_percentage"][density_percentage["event"]==event].dropna())(xs)
 
-event = [0]*xs.size
+max_events = [0]*xs.size
 for x in range(xs.size):
     maxi=0
     for i in range(density_percentage["event"].unique().size):
-        if maxi < kernel[i][x]:
-            maxi = kernel[i][x]
-            event[x] = density_percentage["event"].unique()[i]
+        if maxi < kernels[i][x]:
+            maxi = kernels[i][x]
+            max_events[x] = density_percentage["event"].unique()[i]
 
-test = event[0]
-breaks = []
-x = 0
+max_event = max_events[0]
+breaks = [0]
 limit = 0
 for x in range(xs.size):
     limit +=1
-    if (test != event[x]) & (limit > xs.size*0.2):
-        limit = 0
-        test = event[x]
-        breaks.append(x)
-    if (test != event[x]) & ~(limit > xs.size*0.2):
-        test = event[x]
+    if max_event != max_events[x]:
+        if limit > xs.size*0.2:
+            limit = 0
+            max_event = max_events[x]
+            breaks.append(x)
+        else:
+            max_event = max_events[x]
+breaks.append(xs.size)
 
-breaks
-xs.size
+kernels=[0]*density_percentage["event"].unique().size
+for i,event in enumerate(density_percentage["event"].unique()):
+    kernels[i] = gaussian_kde(density_percentage["timestamp_percentage"][(density_percentage["event"]==event) & (density_percentage["timestamp_percentage"]>=breaks[0]) & (density_percentage["timestamp_percentage"]<=breaks[4])].dropna())(xs[breaks[0]:breaks[4]])
+    plt.plot(xs[breaks[0]:breaks[4]],kernels[i],color=colors[i],label=density_percentage["event"].unique()[i])
+
+plt.gcf().clear()
+len(kernels[2])
+breaks[4]
+plt.show()

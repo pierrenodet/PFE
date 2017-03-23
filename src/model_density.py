@@ -33,9 +33,6 @@ density_difference.drop(density_difference[density_difference["event"]=="quote_l
 
 density_difference.to_csv(cmd_folder+"data/interim/density_difference.csv",index=False)
 
-#density_data_cleaned = density_data[~((density_data["event"]=="projet")&(density_data["status"]=="Gagné"))]
-#density_data_cleaned = density_data_cleaned[~((density_data_cleaned["event"]=="passage_en_magasin")& (density_data_cleaned["timestamp_difference"]==timedelta(minutes=0)))]
-
 first_event_timestamp = density_percentage[["buyer_id","timestamp"]].groupby("buyer_id").min().reset_index()
 density_percentage = pd.merge(density_percentage,first_event_timestamp,on="buyer_id")
 density_percentage.rename(columns={'timestamp_x':'timestamp','timestamp_y':'first_event_timestamp'},inplace=True)
@@ -47,7 +44,7 @@ density_percentage.drop(density_percentage[density_percentage["event"]=="quote_l
 density_percentage.to_csv(cmd_folder+"data/processed/density_percentage.csv",index=False)
 
 xs=linspace(0,1,1000)
-kernels=[[]*density_percentage["event"].unique().size]*xs.size
+kernels=[[]*xs.size]*density_percentage["event"].unique().size
 for i,event in enumerate(density_percentage["event"].unique()):
     kernels[i] = gaussian_kde(density_percentage["timestamp_percentage"][density_percentage["event"]==event].dropna())(xs)
 
@@ -71,6 +68,7 @@ for x in range(xs.size):
             breaks.append(x)
         else:
             max_event = max_events[x]
+breaks.append(xs.size)
 
 colors = [ cm.jet(x) for x in linspace(0.0,1.0, density_percentage["event"].unique().size) ]
 
@@ -78,8 +76,29 @@ with open(cmd_folder+"output/data/breaks.txt",'w') as breaks_file:
     breaks_file.write('\n'.join(str(b/xs.size) for b in breaks))
 
 plt.gcf().clear()
+plt.figure(figsize=(16,10))
 for i,event in enumerate(density_percentage["event"].unique()):
-    (density_percentage["timestamp_percentage"][density_percentage["event"]==event]).plot(kind="density",use_index=False,label=event,figsize=(10,8),c=colors[i]).set_xlim(0,1)
+    (density_percentage["timestamp_percentage"][density_percentage["event"]==event]).hist(stacked=True,bins=20,color=colors[i],label=event).set_xlim(0,1)
+plt.legend(loc=2,prop={'size':6})
+plt.savefig(cmd_folder+"output/picture/hist.svg",bbox_inches='tight')
+
+plt.gcf().clear()
+plt.figure(figsize=(16,10))
+plt.stackplot(xs,kernels,colors=colors)
+plt.legend(density_percentage["event"].unique(),prop={'size':6})
+plt.savefig(cmd_folder+"output/picture/density_stacked.svg",bbox_inches='tight')
+
+plt.gcf().clear()
+plt.figure(figsize=(16,10))
+for i,event in enumerate(density_percentage["event"].unique()):
+    plt.plot(xs,kernels[i],c=colors[i],label=event)
+plt.legend(loc=2,prop={'size':6})
+plt.savefig(cmd_folder+"output/picture/density.svg",bbox_inches='tight')
+
+plt.gcf().clear()
+plt.figure(figsize=(16,10))
+for i,event in enumerate(density_percentage["event"].unique()):
+    plt.plot(xs,kernels[i],c=colors[i],label=event)
 plt.legend(loc=2,prop={'size':6})
 for b in breaks[1:len(breaks)]:
     plt.axvline(b/xs.size,linestyle="--")
