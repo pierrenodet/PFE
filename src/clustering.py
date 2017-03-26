@@ -15,7 +15,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn.cluster import AgglomerativeClustering
 
 replacement = pd.DataFrame(columns=['event','lettre'])
-i= 0
+i=0
 xd = 'abcdefghijklmnopqrstuvwxyz'
 for word in buyer_history.event.unique():
     replacement.loc[len(replacement)] = [word,xd[i]]
