@@ -16,8 +16,6 @@ def stringlist_to_datelist(stringlist):
         datelist[i] = datetime.strptime(string.split(".")[0],"%Y-%m-%d %H:%M:%S")
     return datelist
 
-history["timestamp"]=stringlist_to_datelist(history["timestamp"])
-
 history.drop_duplicates(inplace=True)
 
 group=pd.read_excel(cmd_folder+"data/raw/PFEensai2017_description_des_donnees.xlsx")
@@ -35,6 +33,3 @@ non_buyer_history = history.drop(buyer_history.index)
 non_buyer_history.to_csv(cmd_folder+"data/interim/non_buyer_history.csv",index=False)
 
 buyer_history.to_csv(cmd_folder+"data/interim/buyer_history.csv",index=False)
-
-
-#buyer_history=pd.read_csv(cmd_folder + "data/raw/export_ensai_buyersHistory_170216.csv",sep="\t",header=None)
