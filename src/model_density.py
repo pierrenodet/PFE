@@ -79,21 +79,21 @@ plt.gcf().clear()
 plt.figure(figsize=(16,10))
 for i,event in enumerate(density_percentage["event"].unique()):
     (density_percentage["timestamp_percentage"][density_percentage["event"]==event]).hist(stacked=True,bins=20,color=colors[i],label=event).set_xlim(0,1)
-plt.legend(loc=2,prop={'size':6})
-plt.savefig(cmd_folder+"output/picture/hist.svg",bbox_inches='tight')
+plt.legend(prop={'size':6})
+plt.savefig(cmd_folder+"output/picture/hist.png",bbox_inches='tight')
 
 plt.gcf().clear()
 plt.figure(figsize=(16,10))
 plt.stackplot(xs,kernels,colors=colors)
 plt.legend(density_percentage["event"].unique(),prop={'size':6})
-plt.savefig(cmd_folder+"output/picture/density_stacked.svg",bbox_inches='tight')
+plt.savefig(cmd_folder+"output/picture/density_stacked.png",bbox_inches='tight')
 
 plt.gcf().clear()
 plt.figure(figsize=(16,10))
 for i,event in enumerate(density_percentage["event"].unique()):
     plt.plot(xs,kernels[i],c=colors[i],label=event)
 plt.legend(loc=2,prop={'size':6})
-plt.savefig(cmd_folder+"output/picture/density.svg",bbox_inches='tight')
+plt.savefig(cmd_folder+"output/picture/density.png",bbox_inches='tight')
 
 plt.gcf().clear()
 plt.figure(figsize=(16,10))
@@ -102,4 +102,4 @@ for i,event in enumerate(density_percentage["event"].unique()):
 plt.legend(loc=2,prop={'size':6})
 for b in breaks[1:len(breaks)]:
     plt.axvline(b/xs.size,linestyle="--")
-plt.savefig(cmd_folder+"output/picture/density_breaks.svg",bbox_inches='tight')
+plt.savefig(cmd_folder+"output/picture/density_breaks.png",bbox_inches='tight')
