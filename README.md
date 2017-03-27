@@ -49,3 +49,11 @@ Comment télécharger Jupyter Notebook :
 
 pip3 install jupyter  
 pip3 install ipython
+
+## Authors
+
+* **Pierre NODET** - [Pierre](https://github.com/PierreNodet)
+
+* **Jérémy LE GALL** - [Jérémy](https://github.com/JeremyLG)
+
+* **Laure NICOLLET** - [Laure](https://github.com/laurenicollet)
