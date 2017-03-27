@@ -1,4 +1,4 @@
-from explore_data import buyer_history
+buyer_history=pd.read_csv(cmd_folder+"data/processed/buyer_history.csv")
 from make_trace_bis import trace
 from find_dir import cmd_folder
 

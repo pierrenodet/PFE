@@ -1,35 +1,27 @@
 import pandas as pd
-from datetime import datetime
 from find_dir import cmd_folder
+from clean_data import stringlist_to_datelist
+from datetime import timedelta
 
-##Importing Data
+## Important modifications of data resulting from exploration
 
-history=pd.read_csv(cmd_folder + "data/raw/export_ensai_history_170307170002.csv",sep="\t",header=None)
+buyer_history=pd.read_csv(cmd_folder+"data/interim/buyer_history.csv")
 
-##Cleaning Data
+buyer_history = buyer_history.loc[list(buyer_history.loc[:,["buyer_id","timestamp","event"]].drop_duplicates().index),:]
 
-history.columns=["buyer_id","visit_id","timestamp","event","status"]
+buyer_history.drop(pd.merge(buyer_history, pd.DataFrame(buyer_history.groupby("buyer_id")["event"].count().sort_values(ascending=False)[0:4].index), on=["buyer_id"],right_index=True).index,inplace=True)
 
-def stringlist_to_datelist(stringlist):
-    datelist=[0]*stringlist.size
-    for i,string in enumerate(stringlist):
-        datelist[i] = datetime.strptime(string.split(".")[0],"%Y-%m-%d %H:%M:%S")
-    return datelist
+buyer_history["timestamp"]=stringlist_to_datelist(buyer_history["timestamp"])
 
-history.drop_duplicates(inplace=True)
+#ces 4 lignes sont a faire a la place de la ligne suivante si elle ne marche pas
+#diff_ts0 = []
+#for i in range(len(buyer_history.groupby("buyer_id"))):
+#    diff_ts0.append(timedelta.total_seconds((buyer_history.groupby("buyer_id")["timestamp"].max()-buyer_history.groupby("buyer_id")["timestamp"].min())[i]))
+#diff_ts = pd.Series(data=diff_ts0, index=(buyer_history.groupby("buyer_id")["timestamp"].max()-buyer_history.groupby("buyer_id")["timestamp"].min()).index)
+diff_ts = (buyer_history.groupby("buyer_id")["timestamp"].max()-buyer_history.groupby("buyer_id")["timestamp"].min()).apply(timedelta.total_seconds)
+buyer_history = pd.merge(buyer_history,pd.DataFrame(diff_ts[diff_ts>86400].index),on="buyer_id",how="inner")
 
-group=pd.read_excel(cmd_folder+"data/raw/PFEensai2017_description_des_donnees.xlsx")
-group.rename(columns={'event_name':'event','group_name':'group'},inplace=True)
-history.loc[:,"event"]=history[["event","status"]].reset_index().merge(group,on=["event","status"]).set_index('index')["group"]
-history.drop("status",axis=1,inplace=True)
+len_trace = buyer_history.groupby("buyer_id").size()
+buyer_history = pd.merge(buyer_history,pd.DataFrame(len_trace[len_trace>3].index),on="buyer_id",how="inner")
 
-non_buyer_history = pd.DataFrame(columns=["buyer_id","visit_id","timestamp","event"])
-buyer_history = pd.DataFrame(columns=["buyer_id","visit_id","timestamp","event"])
-
-buyer_history = pd.merge(history,pd.DataFrame(history[history["event"]=="project_win"]["buyer_id"].values,columns=["buyer_id"]),how="inner",on="buyer_id",right_index=True)
-
-non_buyer_history = history.drop(buyer_history.index)
-
-non_buyer_history.to_csv(cmd_folder+"data/interim/non_buyer_history.csv",index=False)
-
-buyer_history.to_csv(cmd_folder+"data/interim/buyer_history.csv",index=False)
+buyer_history.to_csv(cmd_folder+"data/processed/buyer_history.csv",index=False)

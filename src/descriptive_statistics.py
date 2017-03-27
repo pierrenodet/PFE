@@ -15,7 +15,6 @@ non_buyer_history = non_buyer_history.loc[list(non_buyer_history.loc[:,["buyer_i
 len(set(buyer_history["buyer_id"])) #nb of buyers
 len(set(non_buyer_history["buyer_id"])) #nb of non buyers
 
-
 #buyers descriptive statistics
 buyer_history["buyer_id"].value_counts().describe()
 
@@ -38,7 +37,7 @@ plt.savefig(cmd_folder+"output/picture/piechart.svg", bbox_inches='tight')
 
 buyer_history = pd.read_csv(cmd_folder+"data/processed/buyer_history.csv")
 len(set(buyer_history["buyer_id"]))
-buyer_history["event"].value_counts() # occurences of each event after keeping only the 3092 buyers 
+buyer_history["event"].value_counts() # occurences of each event after keeping only the 3092 buyers
                     # with more than 3 events and more than one day between their firt and last event
 
 r=range(22)
