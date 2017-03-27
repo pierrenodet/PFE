@@ -1,5 +1,3 @@
-# PARTIE 1 : calcul des matrices de transitions de chaque individu
-
 from find_dir import cmd_folder
 import pandas as pd
 import json
@@ -10,7 +8,6 @@ from matplotlib import pyplot as plt
 
 buyer_history = pd.read_csv(cmd_folder+"data/processed/buyer_history.csv")
 trace = json.load(open(cmd_folder+"data/processed/trace_regroup.json","r"))
-
 
 listEvts = []
 listEvts.append("start")
@@ -45,6 +42,7 @@ del(ind1, ind2, dist)
 distArray = ssd.squareform(distanceMatrix)
 del(distanceMatrix)
 
+#CAH
 clustering = sch.linkage(distArray, method='average')
 
 plt.figure(figsize=(25, 10))
@@ -62,3 +60,16 @@ sch.dendrogram(
 )
 plt.axhline(y=17, c='k')
 plt.savefig(cmd_folder+"output/picture/dendrogram.png", bbox_inches='tight')
+
+
+#DBSCAN
+import sklearn.cluster as sc
+
+res = sc.dbscan(distanceMatrix, metric="precomputed")
+clusters = res[1].tolist()
+vec = [(clusters.count(x)) for x in range(min(clusters),max(clusters))]
+
+
+plt.figure(figsize=(8, 5))
+plt.bar(range(min(clusters),max(clusters)), vec)
+plt.savefig(cmd_folder+"output/picture/DBSCAN_2grams.png", bbox_inches='tight')

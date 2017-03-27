@@ -41,6 +41,12 @@ len(set(buyer_history["buyer_id"]))
 buyer_history["event"].value_counts() # occurences of each event after keeping only the 3092 buyers 
                     # with more than 3 events and more than one day between their firt and last event
 
+r=range(22)
+plt.figure(figsize=(8, 5))
+plt.barh(r, buyer_history["event"].value_counts())
+plt.yticks([r + 0.5 for r in range(22)], buyer_history["event"].value_counts().index)
+plt.savefig(cmd_folder+"output/picture/buyersEventCount.png", bbox_inches='tight')
+
 
 #non buyers descriptive statistics
 non_buyer_history["buyer_id"].value_counts().describe()
