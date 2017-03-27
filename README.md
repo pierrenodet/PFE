@@ -14,12 +14,14 @@ Néanmoins ce n'est pas fait pour du gros traitement de données. Ainsi tout le 
 
 En fait à la fin du projet seul le src devra être nécessaire pour pouvoir trouver la modélisation attendu (indépendamment des notebooks). Il faudra toutefois éviter de faire un code trop lourd dans le src (pas de tests, pas de brouillon, pas de commentaires, ...)
 
+Enfin le dossier src est struturé comme un package python classique avec un éxecutable contenu dans le main. Lorsque celui ci est executé, tous les résultats (tableaux, chiffres ou images) du rapports doivent être générés ainsi que toutes les données transformées.
+
 Cette organisation de projet est fortement inspiré de ce site :
 https://drivendata.github.io/cookiecutter-data-science/
 
 Je vous laisse donc consulter les détails dessus.
 
-## Configuration File (Pas utile pour le moment)
+## Configuration File
 
 Dans ce repository il y a un fichier de configuration écrit en YAML (version "human readable" de JSON).
 
@@ -27,6 +29,8 @@ Ce fichier contient des informations nécessaires au script pour s'éxecuter mai
 Par exemple le fichier de configuration contient actuellement le dossier contenant les données : ce chemin est différent pour chacun d'entre nous.
 
 En revanche vous devez posséder sur votre machine un autre config.yml qui sera utilisé pour le script. Celui ci ne dois pas être push (.gitignore) car il contient des données qui vous sont propres. Le config.sample.yml est juste un patron qui est utilisé pour créer le véritable config.yml.
+
+Dans notre cas il contient les données relatives au ftp. L'example sur le github montre tous les paramètres qui doivent être renseignés, sauf pour le mot de passe.
 
 ## Dépendances
 
