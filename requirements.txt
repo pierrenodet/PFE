@@ -31,10 +31,10 @@ lxml==3.5.0
 Mako==1.0.3
 MarkupSafe==0.23
 matplotlib==2.0.0
-mistune==0.7.3
+mistune>=0.8.1
 nbconvert==4.2.0
 nbformat==4.1.0
-notebook==4.2.3
+notebook>=5.7.2
 numpy==1.12.0
 oauthlib==1.0.3
 onboard==1.2.0
@@ -42,7 +42,7 @@ padme==1.1.1
 pandas==0.19.2
 pexpect==4.2.1
 pickleshare==0.7.4
-Pillow==3.1.2
+Pillow>=3.3.2
 plainbox==0.25
 prompt-toolkit==1.0.9
 ptyprocess==0.5.1
@@ -60,11 +60,11 @@ python-debian==0.1.27
 python-systemd==231
 pytz==2016.10
 pyxdg==0.25
-PyYAML==3.12
+pyyaml>=4.2b1
 pyzmq==16.0.1
 qtconsole==4.2.1
 reportlab==3.3.0
-requests==2.9.1
+requests>=2.20.0
 scipy==0.18.1
 sessioninstaller==0.0.0
 simplegeneric==0.8.1
@@ -89,7 +89,7 @@ unity-scope-tomboy==0.1
 unity-scope-virtualbox==0.1
 unity-scope-yelp==0.1
 unity-scope-zotero==0.1
-urllib3==1.13.1
+urllib3>=1.23
 usb-creator==0.3.0
 wcwidth==0.1.7
 widgetsnbextension==1.2.6
